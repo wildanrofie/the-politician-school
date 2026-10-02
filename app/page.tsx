@@ -1,489 +1,193 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { initLanding } from "./landing";
 
-const slides = [
-  {
-    kicker: "THE POLITICIAN SCHOOL · PEMILU 2029",
-    title: ["2029", "dimulai", "sekarang."],
-    body: [
-      "Bootcamp untuk kandidat yang ingin menyiapkan nama, memahami dapil, menyusun strategi, dan membangun tim sejak sekarang.",
-      "Bukan enam bulan sebelum hari pencoblosan."
-    ],
-    meta: "CHAPTER 01 · START EARLY",
-  },
-  {
-    kicker: "MEMBACA ARENA",
-    title: ["Kenali", "dapilmu."],
-    body: [
-      "Pahami karakter pemilih, peta kompetisi, isu lokal, dan ruang yang masih bisa dimenangkan.",
-      "Data bukan sekadar angka. Data membantu menentukan langkah yang perlu didahulukan."
-    ],
-    meta: "CHAPTER 02 · READ THE DISTRICT",
-  },
-  {
-    kicker: "DARI DATA KE STRATEGI",
-    title: ["Bangun", "rencana", "yang bekerja."],
-    body: [
-      "Susun prioritas, target, tahapan kampanye, positioning, komunikasi, dan cara kerja tim yang lebih terukur.",
-      "Materi dirancang dari pengalaman riset dan konsultasi politik Politika Research & Consulting."
-    ],
-    meta: "CHAPTER 03 · BUILD THE PLAN",
-  },
-  {
-    kicker: "PENGALAMAN YANG MENJADI MATERI",
-    title: ["Riset.", "Strategi.", "Evaluasi."],
-    body: [
-      "Sejak 2014, Politika Research & Consulting bekerja di bidang survei, analisis elektoral, branding, quick count, exit poll, dan pendampingan kandidat.",
-      "The Politician School membawa pengalaman itu ke ruang belajar yang lebih terstruktur."
-    ],
-    meta: "CHAPTER 04 · EXPERIENCE",
-  },
-  {
-    kicker: "INVESTASI PROGRAM",
-    title: ["Siapkan", "2029", "dengan serius."],
-    body: [
-      "Early Bird Rp6,5 juta untuk 10 pendaftar pertama. Harga normal Rp8,5 juta.",
-      "Termasuk akomodasi satu malam, konsumsi, materi, sertifikat, Laporan Pemetaan Dapil, dan forum alumni."
-    ],
-    meta: "CHAPTER 05 · INVESTMENT",
-  },
-];
+// The page markup. Edit the copy here; styles live in globals.css,
+// motion and canvases in landing.js.
+const MARKUP = `<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="plateClip" clipPathUnits="objectBoundingBox"><path d="M 0.01915,0.00107H 0.98085C 0.98574,0.00107 0.99044,0.00300 0.99390,0.00642C 0.99736,0.00984 0.99930,0.01449 0.99930,0.01933V 0.88815C 0.99930,0.89299 0.99736,0.89763 0.99390,0.90105C 0.99044,0.90448 0.98574,0.90640 0.98085,0.90640H 0.64733C 0.63864,0.90640 0.63007,0.90834 0.62224,0.91206C 0.61442,0.91579 0.60754,0.92122 0.60212,0.92794L 0.56153,0.97830C 0.55635,0.98474 0.54976,0.98993 0.54227,0.99350C 0.53478,0.99707 0.52656,0.99892 0.51825,0.99892H 0.01915C 0.01426,0.99892 0.00956,0.99700 0.00610,0.99358C 0.00264,0.99016 0.00070,0.98551 0.00070,0.98067V 0.01933C 0.00070,0.01449 0.00264,0.00984 0.00610,0.00642C 0.00956,0.00300 0.01426,0.00107 0.01915,0.00107Z"/></clipPath>
+    <symbol id="br" viewBox="0 0 10.5 10.5"><path d="M0 0.5H10V10.5"/></symbol>
+    <symbol id="arr" viewBox="0 0 13.7071 10.7071"><path d="M0 5.35355H13M8 10.3536L13 5.35355L8 0.353553"/></symbol>
+  </defs>
+</svg>
 
-const navItems = ["Mulai", "Dapil", "Strategi", "Pengalaman", "Investasi"];
+<div class="veil" id="veil" role="status" aria-label="Memuat Menang Politik">
+  <div class="veil-inner">
+    <div class="sil" id="sil"><i></i><i></i></div>
+    <div class="veil-name">Menang Politik</div>
+  </div>
+  <div class="meter" id="meter"><i></i></div>
+</div>
 
-function AnimatedTitle({ lines, active }: { lines: string[]; active: boolean }) {
-  let counter = 0;
+<main>
+<div class="stack" id="stack">
 
-  return (
-    <h2 className="cinematic-title" aria-label={lines.join(" ")}>
-      {lines.map((line, lineIndex) => (
-        <span className="title-line" key={`${line}-${lineIndex}`}>
-          {Array.from(line).map((char, charIndex) => {
-            const delay = counter++ * 0.026;
-            return (
-              <span
-                className={`title-char ${active ? "title-char-active" : ""}`}
-                style={{ transitionDelay: `${delay}s` }}
-                key={`${lineIndex}-${charIndex}`}
-                aria-hidden="true"
-              >
-                {char === " " ? "\u00A0" : char}
-              </span>
-            );
-          })}
-        </span>
-      ))}
-    </h2>
-  );
-}
+  <!-- 1 · HERO -->
+  <div class="layer"><div class="layer-inner">
+  <section class="hero" data-hero aria-labelledby="hero-name">
+    <canvas class="contours" id="heroField" aria-hidden="true"></canvas>
+    <div class="hero-col">
+      <header class="mast" data-rise data-hero-in="0">
+        <a href="#" class="wordmark" aria-label="Menang Politik"><span class="mk" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Menang<br>Politik</span></a>
+        <p class="mast-tag">Jadi Caleg, atau Caleg Jadi?</p>
+        <a class="navlink garage" href="#alur"><span aria-hidden="true">[ </span>Daftar<span aria-hidden="true"> → ]</span></a>
+      </header>
 
-function CinematicCanvas({ progressRef }: { progressRef: React.MutableRefObject<number> }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+      <div class="hero-mid">
+        <div class="ident">
+          <div class="id" data-rise data-hero-in="180">mentor_utama</div>
+          <h1 id="hero-name" class="disp" data-split="words" data-hero-in="180" data-stagger="110">Rio Prayogo</h1>
+          <ul class="meta">
+            <li data-rise data-hero-in="440"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="0.5" y="0.5" width="7" height="7" fill="#090a0b"/><rect x="8.5" y="8.5" width="7" height="7" fill="#090a0b"/><rect x="8.5" y="0.5" width="7" height="7" fill="#12245a"/></svg>Konsultan Politik Nasional</li>
+            <li data-rise data-hero-in="570"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.8 5.2H15l-4.2 3.1 1.6 5.2L8 11.3l-4.4 3.2 1.6-5.2L1 6.2h5.2z" fill="#090a0b"/></svg>Founder, Politika Research &amp; Consulting</li>
+            <li data-rise data-hero-in="700"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#090a0b"/><circle cx="8" cy="8" r="2.5" fill="#090a0b"/></svg>Bupati Situbondo</li>
+          </ul>
+        </div>
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+        <div class="panels" data-rise data-hero-in="900">
+          <div class="bpanel">
+            <div class="brackets" aria-hidden="true"><svg class="tl"><use href="#br"/></svg><svg class="tr"><use href="#br"/></svg><svg class="bl"><use href="#br"/></svg><svg class="br"><use href="#br"/></svg></div>
+            <div class="eyebrow">bootcamp berikutnya</div>
+            <dl><dt>Batch 01</dt><dd>Kelas tatap muka</dd><dd>Jadwal &amp; lokasi diumumkan</dd></dl>
+          </div>
+          <div class="bpanel">
+            <div class="brackets" aria-hidden="true"><svg class="tl"><use href="#br"/></svg><svg class="tr"><use href="#br"/></svg><svg class="bl"><use href="#br"/></svg><svg class="br"><use href="#br"/></svg></div>
+            <div class="eyebrow">format program</div>
+            <dl class="stats3">
+              <div><dt>Hari</dt><dd>2</dd></div>
+              <div><dt>Malam</dt><dd>1</dd></div>
+              <div><dt>Modul</dt><dd>5</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      <div class="hero-photo photo" id="heroPhoto" role="img" aria-label="Rio Prayogo, Konsultan Politik Nasional"></div>
 
-    let raf = 0;
-    let width = 0;
-    let height = 0;
-    let dpr = 1;
-    let mouseX = 0;
-    let mouseY = 0;
+      <div class="actions" data-rise data-hero-in="1300">
+        <div class="tag"><b class="tag-full">Bootcamp caleg</b><b class="tag-short">Jadi Caleg, atau Caleg Jadi?</b><span>by Politika Research &amp; Consulting</span></div>
+        <a class="cta" href="#alur">
+          <svg class="frame" viewBox="0 0 220 50" preserveAspectRatio="none" aria-hidden="true"><path class="body" d="M220 42L212.932 50H0V0H220V42Z"/><path class="flood" d="M220 42L212.932 50H0V0H220V42Z"/><path class="ring" d="M220 42L212.932 50H0V0H220V42Z"/><path class="hook" d="M205 49.5H213L219.5 42V36M212 0.5H219.5V7M8 0.5H0.5V7M7.5 49.5H0.5V42.5"/></svg>
+          <span>Daftar batch 01</span><svg class="arrow" aria-hidden="true"><use href="#arr"/></svg>
+        </a>
+        <div class="socials"><a href="https://instagram.com">inst</a><a href="https://x.com">x</a><a href="https://youtube.com">youtube</a></div>
+      </div>
+    </div>
+  </section>
+  </div><div class="shade"></div></div>
 
-    const particles = Array.from({ length: 72 }, (_, i) => ({
-      x: ((i * 47) % 1000) / 1000,
-      y: ((i * 83) % 1000) / 1000,
-      r: 0.45 + ((i * 29) % 100) / 100,
-      speed: 0.000018 + ((i * 17) % 10) * 0.0000024,
-      phase: i * 0.83,
-    }));
+  <!-- 2 · KURIKULUM -->
+  <div class="layer"><div class="layer-inner">
+  <section class="kur" id="kurikulum" aria-labelledby="kur-h">
+    <canvas class="field" id="kurField" aria-hidden="true"></canvas>
+    <canvas class="dissolve" data-carry="light" aria-hidden="true"></canvas>
+    <div class="kur-col">
+      <div data-group>
+        <h2 id="kur-h" class="disp"><span class="split" data-split="words" data-stagger="110">Kurikulum</span><span class="split" data-split="words" data-stagger="110" data-delay="130">menang<span class="dot">.</span></span></h2>
+        <div class="rule"></div>
+        <p class="lede split" data-split="words" data-stagger="34" data-delay="350">Lima modul, satu rute. Dari membaca dapil sampai mengawal suara di hari pemungutan.</p>
+      </div>
+      <div class="kur-foot">
+        <ol class="mods" id="mods">
+          <li data-rise style="--d:0ms"><span class="n">Modul 01</span><b>Baca dapil</b><span>Peta suara, basis, dan lawan yang sebenarnya.</span></li>
+          <li data-rise style="--d:90ms"><span class="n">Modul 02</span><b>Data &amp; survei</b><span>Ukur elektabilitas sebelum bergerak.</span></li>
+          <li data-rise style="--d:180ms"><span class="n">Modul 03</span><b>Citra kandidat</b><span>Pesan, wajah, dan cerita yang dipercaya pemilih.</span></li>
+          <li data-rise style="--d:270ms"><span class="n">Modul 04</span><b>Mesin lapangan</b><span>Relawan, tim, dan ritme kampanye.</span></li>
+          <li data-rise style="--d:360ms"><span class="n">Modul 05</span><b>Kawal suara</b><span>Saksi, rekap, dan hari pemungutan.</span></li>
+        </ol>
+        <div class="plate" data-rise style="--d:260ms">
+          <svg class="pf" viewBox="0 0 277 78" preserveAspectRatio="none" aria-hidden="true"><path d="M0.5 0.5H276.5V69L268 77.5H0.5Z"/><line x1="83" y1="0.5" x2="83" y2="77.5"/></svg>
+          <div class="badge"><svg viewBox="0 0 37 23" aria-hidden="true"><ellipse cx="18.5" cy="11.5" rx="18" ry="11"/><line x1="0.5" y1="11.5" x2="36.5" y2="11.5"/><ellipse id="meridian" cx="18.5" cy="11.5" rx="18" ry="11"/></svg><span>MP <span style="color:var(--accent)">/ 01</span></span></div>
+          <dl class="rows"><div><dt>2</dt><dd>hari tatap muka</dd></div><div><dt>1</dt><dd>malam simulasi</dd></div><div><dt>5</dt><dd>modul inti.</dd></div></dl>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div><div class="shade"></div></div>
 
-    const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
+  <!-- 3 · AGENDA -->
+  <div class="layer last">
+  <section class="agenda" id="agenda" aria-labelledby="ag-h">
+    <canvas class="dissolve" data-carry="light" aria-hidden="true"></canvas>
+    <div class="ag-wrap">
+      <h2 id="ag-h" class="disp"><span class="split" data-split="words" data-stagger="110">Dua hari,</span><span class="split" data-split="words" data-stagger="110" data-delay="130">satu malam<span class="dot">.</span></span></h2>
+      <div class="rail" id="rail" aria-hidden="true"><svg id="railSvg"><line class="track" x1="8" x2="8" y1="0" y2="98"/><line class="track" id="railDash" x1="8" x2="8" y1="102" y2="200" stroke-dasharray="6 6"/><rect id="railRun" x="7.5" y="0" width="1" height="0" fill="#fff"/><rect id="railMark" x="-4.5" y="-4.5" width="9" height="9" fill="#fff"/></svg></div>
+      <div id="rows"></div>
+    </div>
+  </section>
+  </div>
+</div>
 
-    const onMouse = (event: MouseEvent) => {
-      mouseX = event.clientX / Math.max(1, width) - 0.5;
-      mouseY = event.clientY / Math.max(1, height) - 0.5;
-    };
+<!-- 4 · MENTOR -->
+<section class="mentor" id="mentor" aria-labelledby="m-h">
+  <canvas class="contours" id="mentorField" aria-hidden="true"></canvas>
+  <div class="band" aria-hidden="true"></div>
+  <div class="m-photo photo" id="mPhoto" role="img" aria-label="Rio Prayogo"></div>
+  <div class="m-melt" aria-hidden="true"></div>
+  <canvas class="dissolve" data-carry="dark" aria-hidden="true"></canvas>
+  <h2 id="m-h" class="disp"><span class="split" data-split="words" data-stagger="110">Dari lapangan</span><span class="split" data-split="words" data-stagger="110" data-delay="130">ke kursi<span class="dot">.</span></span></h2>
+  <div class="m-intro" data-group>
+    <p class="split" data-split="words" data-stagger="30" data-delay="350">Rio Prayogo membangun Politika Research &amp; Consulting sebagai konsultan, lalu memenangkan kursi Bupati Situbondo. Bootcamp ini berisi cara kerja yang ia pakai di lapangan.</p>
+    <a class="cta" href="#alur" data-rise style="--d:520ms">
+      <svg class="frame" viewBox="0 0 217 50" preserveAspectRatio="none" aria-hidden="true"><path class="body" d="M0.5 0.5H216.5V42L209 49.5H0.5Z"/><path class="flood" d="M0.5 0.5H216.5V42L209 49.5H0.5Z"/></svg>
+      <span>Lihat alur</span><svg class="arrow" aria-hidden="true"><use href="#arr"/></svg>
+    </a>
+  </div>
+  <div class="m-panels">
+    <div class="bpanel" data-rise style="--d:320ms">
+      <div class="brackets" aria-hidden="true"><svg class="tl"><use href="#br"/></svg><svg class="tr"><use href="#br"/></svg><svg class="bl"><use href="#br"/></svg><svg class="br"><use href="#br"/></svg></div>
+      <div class="who"><b>Rio Prayogo</b><span>Konsultan Politik Nasional</span><span>Mentor utama</span></div>
+    </div>
+    <div class="bpanel" data-rise style="--d:460ms">
+      <div class="brackets" aria-hidden="true"><svg class="tl"><use href="#br"/></svg><svg class="tr"><use href="#br"/></svg><svg class="bl"><use href="#br"/></svg><svg class="br"><use href="#br"/></svg></div>
+      <div class="mstats">
+        <div class="mstat"><span>Jabatan</span><b>Bupati Situbondo</b></div>
+        <div class="mstat"><span>Lembaga</span><b>PRC</b></div>
+        <div class="mstat"><span>Format kelas</span><b>Tatap muka</b></div>
+        <div class="mstat"><span>Program</span><b>2 hari 1 malam</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="strip" id="alur" aria-label="Alur pendaftaran">
+    <ol class="steps">
+      <li class="step live" data-rise style="--d:0ms"><div class="brackets livebox" aria-hidden="true"><svg class="tl"><use href="#br"/></svg><svg class="tr"><use href="#br"/></svg><svg class="bl"><use href="#br"/></svg><svg class="br"><use href="#br"/></svg></div><span class="r">Langkah 1</span><b>Daftar minat</b><span class="s">Dibuka</span><span class="mark"><svg viewBox="0 0 11 11" aria-hidden="true"><circle id="pulse" cx="5.5" cy="5.5" r="5.5" fill="none" stroke="#8aa3e8" vector-effect="non-scaling-stroke"/><circle cx="5.5" cy="5.5" r="5.5" fill="#8aa3e8"/></svg></span></li>
+      <li class="step" data-rise style="--d:90ms"><span class="r">Langkah 2</span><b>Wawancara</b><span class="s">Singkat</span><span class="mark"><svg viewBox="0 0 11 11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="5" fill="none" stroke="#fff"/></svg></span></li>
+      <li class="step" data-rise style="--d:180ms"><span class="r">Langkah 3</span><b>Kunci kursi</b><span class="s">Kelas terbatas</span><span class="mark"><svg viewBox="0 0 11 11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="5" fill="none" stroke="#fff"/></svg></span></li>
+      <li class="step" data-rise style="--d:270ms"><span class="r">Langkah 4</span><b>Bootcamp</b><span class="s">2 hari 1 malam</span><span class="mark"><svg viewBox="0 0 11 11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="5" fill="none" stroke="#fff"/></svg></span></li>
+      <li class="step" data-rise style="--d:360ms"><span class="r">Langkah 5</span><b>Rencana menang</b><span class="s">Dibawa pulang</span><span class="mark"><svg viewBox="0 0 11 11" aria-hidden="true"><circle cx="5.5" cy="5.5" r="5" fill="none" stroke="#fff"/></svg></span></li>
+    </ol>
+  </div>
+</section>
 
-    const draw = (time: number) => {
-      const t = time * 0.001;
-      const progress = progressRef.current;
-
-      ctx.clearRect(0, 0, width, height);
-
-      const base = ctx.createLinearGradient(0, 0, width, height);
-      base.addColorStop(0, "#07182f");
-      base.addColorStop(0.42, "#0f2f63");
-      base.addColorStop(1, "#071a38");
-      ctx.fillStyle = base;
-      ctx.fillRect(0, 0, width, height);
-
-      const glow = ctx.createRadialGradient(
-        width * (0.68 + mouseX * 0.03),
-        height * (0.35 + mouseY * 0.025),
-        0,
-        width * 0.68,
-        height * 0.35,
-        Math.max(width, height) * 0.64
-      );
-      glow.addColorStop(0, `rgba(87, 144, 230, ${0.18 + progress * 0.08})`);
-      glow.addColorStop(0.48, "rgba(37, 99, 201, 0.08)");
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, width, height);
-
-      ctx.save();
-      ctx.globalCompositeOperation = "screen";
-
-      const lineCount = 12;
-      for (let j = 0; j < lineCount; j++) {
-        ctx.beginPath();
-        const alpha = 0.035 + (j % 4) * 0.009;
-        ctx.strokeStyle = `rgba(180, 211, 255, ${alpha})`;
-        ctx.lineWidth = 0.7 + (j % 3) * 0.25;
-
-        for (let x = -80; x <= width + 80; x += 18) {
-          const normalized = x / Math.max(width, 1);
-          const yBase = height * (0.10 + j * 0.072);
-          const wave1 =
-            Math.sin(normalized * Math.PI * (2.2 + j * 0.04) + t * 0.12 + progress * 4.4 + j * 0.7) *
-            (34 + j * 1.4);
-          const wave2 =
-            Math.cos(normalized * Math.PI * 3.0 - t * 0.08 - progress * 3.2 + j) * 17;
-          const mouseShift = mouseY * 12 + mouseX * (normalized - 0.5) * 28;
-          const y = yBase + wave1 + wave2 + mouseShift;
-          if (x === -80) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      }
-
-      for (const particle of particles) {
-        const py =
-          (((particle.y - t * particle.speed * 1000 * (1 + progress * 0.8)) % 1) + 1) % 1;
-        const px = particle.x + Math.sin(t * 0.18 + particle.phase) * 0.008;
-        const x = px * width;
-        const y = py * height;
-
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(215, 230, 255, ${0.16 + particle.r * 0.13})`;
-        ctx.arc(x, y, particle.r * 1.2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.restore();
-
-      raf = requestAnimationFrame(draw);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", onMouse);
-    raf = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMouse);
-    };
-  }, [progressRef]);
-
-  return <canvas ref={canvasRef} className="cinematic-canvas" aria-hidden="true" />;
-}
+<!-- 5 · SIGN-OFF -->
+<section class="foot" aria-labelledby="f-h">
+  <div class="foot-panel"><canvas class="contours" id="footField" aria-hidden="true"></canvas></div>
+  <div class="f-photo photo" id="fPhoto" aria-hidden="true"></div>
+  <a href="#" class="wordmark f-logo" data-rise aria-label="Menang Politik"><span class="mk" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Menang<br>Politik</span></a>
+  <h2 id="f-h" class="disp"><span class="split" data-split="words" data-stagger="110">Jadi caleg,</span><span class="split" data-split="words" data-stagger="110" data-delay="130">atau caleg jadi<span class="dot">?</span></span></h2>
+  <nav class="f-nav" aria-label="Bawah">
+    <a href="#kurikulum" class="split letters" data-split="letters" data-stagger="22" data-delay="260">Kurikulum</a>
+    <a href="#agenda" class="split letters" data-split="letters" data-stagger="22" data-delay="340">Agenda</a>
+    <a href="#mentor" class="split letters" data-split="letters" data-stagger="22" data-delay="420">Mentor</a>
+    <a href="#alur" class="split letters" data-split="letters" data-stagger="22" data-delay="500">Daftar</a>
+  </nav>
+  <div class="f-row">
+    <small data-rise style="--d:640ms">© 2026 Menang Politik. Sebuah program Politika Research &amp; Consulting.</small>
+    <a class="cta hollow" href="#alur" data-rise style="--d:720ms">
+      <svg class="frame" viewBox="0 0 275 50" preserveAspectRatio="none" aria-hidden="true"><path class="flood" d="M0.5 0.5H274.5V41.165L266.165 49.5H0.5Z"/><path class="hook" d="M0.5 0.5H274.5V41.165L266.165 49.5H0.5Z"/></svg>
+      <span>Daftar sekarang</span><svg class="arrow" aria-hidden="true"><use href="#arr"/></svg>
+    </a>
+    <div class="socials" data-rise style="--d:800ms"><a href="https://instagram.com">inst</a><a href="https://x.com">x</a><a href="https://youtube.com">youtube</a></div>
+  </div>
+</section>
+</main>`;
 
 export default function Home() {
-  const stageRef = useRef<HTMLElement | null>(null);
-  const progressRef = useRef(0);
-  const [progress, setProgress] = useState(0);
-  const [active, setActive] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const innerCursor = useRef<HTMLDivElement | null>(null);
-  const outerCursor = useRef<HTMLDivElement | null>(null);
-
   useEffect(() => {
-    const updateScroll = () => {
-      const stage = stageRef.current;
-      if (!stage) return;
-
-      const max = Math.max(1, stage.offsetHeight - window.innerHeight);
-      const local = Math.max(0, Math.min(1, (window.scrollY - stage.offsetTop) / max));
-      progressRef.current = local;
-      setProgress(local);
-
-      const index = Math.min(slides.length - 1, Math.floor(local * slides.length));
-      setActive(index);
-    };
-
-    updateScroll();
-    window.addEventListener("scroll", updateScroll, { passive: true });
-    window.addEventListener("resize", updateScroll);
-
-    return () => {
-      window.removeEventListener("scroll", updateScroll);
-      window.removeEventListener("resize", updateScroll);
-    };
+    initLanding();
   }, []);
 
-  useEffect(() => {
-    let outerX = window.innerWidth / 2;
-    let outerY = window.innerHeight / 2;
-    let targetX = outerX;
-    let targetY = outerY;
-    let raf = 0;
-
-    const move = (event: MouseEvent) => {
-      targetX = event.clientX;
-      targetY = event.clientY;
-
-      if (innerCursor.current) {
-        innerCursor.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`;
-      }
-    };
-
-    const animate = () => {
-      outerX += (targetX - outerX) * 0.18;
-      outerY += (targetY - outerY) * 0.18;
-      if (outerCursor.current) {
-        outerCursor.current.style.transform = `translate3d(${outerX}px, ${outerY}px, 0) translate(-50%, -50%)`;
-      }
-      raf = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener("mousemove", move);
-    raf = requestAnimationFrame(animate);
-
-    return () => {
-      window.removeEventListener("mousemove", move);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
-
-  const goToSlide = (index: number) => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    const max = stage.offsetHeight - window.innerHeight;
-    const target = stage.offsetTop + max * (index / slides.length + 0.015);
-    window.scrollTo({ top: target, behavior: "smooth" });
-    setMenuOpen(false);
-  };
-
-  const portraitX = -6 * progress;
-  const portraitY = Math.sin(progress * Math.PI) * -2.6;
-  const portraitScale = 1 + Math.sin(progress * Math.PI) * 0.055;
-  const portraitRotate = 2.2 - progress * 3.2;
-  const portraitOpacity = active === 4 ? 0.48 : 1;
-
-  return (
-    <>
-      <div ref={innerCursor} className="cursor-inner" />
-      <div ref={outerCursor} className="cursor-outer" />
-
-      <main>
-        <section ref={stageRef} className="cinematic-scroll" id="top">
-          <div className="cinematic-sticky">
-            <CinematicCanvas progressRef={progressRef} />
-
-            <div className="cinematic-vignette" />
-            <div className="cinematic-horizontal-line" />
-
-            <div className="cinematic-grid" aria-hidden="true">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div className="cinematic-grid-line" key={i}>
-                  <span
-                    className="grid-dot grid-dot-a"
-                    style={{ top: `${12 + ((progress * (95 + i * 23) + i * 17) % 78)}%` }}
-                  />
-                  <span
-                    className="grid-dot grid-dot-b"
-                    style={{ top: `${18 + ((progress * (130 + i * 19) + i * 31) % 68)}%` }}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <header className="cinematic-header">
-              <button className="cinematic-brand" onClick={() => goToSlide(0)}>
-                THE POLITICIAN SCHOOL
-              </button>
-
-              <nav className="cinematic-nav">
-                {navItems.map((item, i) => (
-                  <span className="nav-item-wrap" key={item}>
-                    <button className={active === i ? "active" : ""} onClick={() => goToSlide(i)}>
-                      {item}
-                    </button>
-                    {i < navItems.length - 1 && <i />}
-                  </span>
-                ))}
-              </nav>
-
-              <button className="cinematic-contact" onClick={() => goToSlide(4)}>
-                Coming Soon <span />
-              </button>
-            </header>
-
-            <div
-              className="political-mark"
-              style={{
-                transform: `translate3d(${portraitX}vw, ${portraitY}vh, 0) scale(${portraitScale}) rotate(${portraitRotate}deg)`,
-                opacity: portraitOpacity,
-              }}
-            >
-              <div className="portrait-halo" />
-              <div className="portrait-frame">
-                <Image
-                  src="/septa-rio-salmanan.png"
-                  alt="Septa Rio Salmanan, Trainer Utama The Politician School"
-                  fill
-                  priority
-                  sizes="(max-width: 800px) 78vw, 42vw"
-                  className="portrait-image"
-                />
-                <div className="portrait-gradient" />
-              </div>
-              <div className="portrait-caption">
-                <span>TRAINER UTAMA</span>
-                <strong>Septa Rio Salmanan</strong>
-                <small>The Politician School</small>
-              </div>
-            </div>
-
-            {slides.map((slide, i) => (
-              <section
-                className={`cinematic-slide cinematic-slide-${i + 1} ${active === i ? "active" : ""}`}
-                key={slide.meta}
-                aria-hidden={active !== i}
-              >
-                <span className="slide-meta">{slide.meta}</span>
-                <span className="slide-kicker">{slide.kicker}</span>
-
-                <AnimatedTitle lines={slide.title} active={active === i} />
-
-                <div className="slide-copy">
-                  {slide.body.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
-                </div>
-
-                {i === 4 && (
-                  <div className="investment-mini">
-                    <div>
-                      <span>EARLY BIRD · 10 PESERTA PERTAMA</span>
-                      <strong>Rp6,5 juta</strong>
-                    </div>
-                    <div>
-                      <span>HARGA NORMAL</span>
-                      <strong>Rp8,5 juta</strong>
-                    </div>
-                  </div>
-                )}
-              </section>
-            ))}
-
-            <div className="story-progress" aria-hidden="true">
-              {slides.map((_, i) => {
-                const segmentStart = i / slides.length;
-                const segmentEnd = (i + 1) / slides.length;
-                const segmentProgress = Math.max(
-                  0,
-                  Math.min(1, (progress - segmentStart) / (segmentEnd - segmentStart))
-                );
-                return (
-                  <div className="story-dash" key={i}>
-                    <div className="story-dash-fill" style={{ height: `${segmentProgress * 100}%` }} />
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="cinematic-bottomline">
-              <span>Powered by Politika Research & Consulting</span>
-              <span>{String(active + 1).padStart(2, "0")} / 05</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="post-cinematic">
-          <div>
-            <span className="post-kicker">YANG ANDA BAWA PULANG</span>
-            <h2>Bekal untuk melanjutkan persiapan setelah bootcamp selesai.</h2>
-          </div>
-
-          <div className="post-benefits">
-            {[
-              "Laporan Pemetaan Dapil",
-              "Strategic Plan",
-              "Materi Bootcamp Eksklusif",
-              "Sertifikat",
-              "Akomodasi 1 Malam",
-              "Seluruh Konsumsi",
-              "Networking",
-              "Forum Alumni",
-            ].map((item, index) => (
-              <div className="post-benefit-row" key={item}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{item}</strong>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <footer className="cinematic-footer">
-          <span>THE POLITICIAN SCHOOL</span>
-          <h2>
-            2029 masih jauh.
-            <br />
-            Justru itu keuntungannya.
-          </h2>
-          <button onClick={() => goToSlide(4)}>Lihat investasi program →</button>
-          <div className="footer-line">
-            <span>© 2026 The Politician School</span>
-            <span>Politika Research & Consulting</span>
-          </div>
-        </footer>
-      </main>
-
-      <button className="mobile-menu-button" onClick={() => setMenuOpen(true)} aria-label="Open menu">
-        Menu
-      </button>
-
-      {menuOpen && (
-        <div className="mobile-menu">
-          <div className="mobile-menu-head">
-            <span>THE POLITICIAN SCHOOL</span>
-            <button onClick={() => setMenuOpen(false)}>×</button>
-          </div>
-          <nav>
-            {navItems.map((item, i) => (
-              <button onClick={() => goToSlide(i)} key={item}>
-                {item}
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
-    </>
-  );
+  return <div id="mp-root" dangerouslySetInnerHTML={{ __html: MARKUP }} />;
 }

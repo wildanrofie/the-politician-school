@@ -1,0 +1,154 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+const benefits = [
+  "Laporan Pemetaan Dapil",
+  "Strategic Plan",
+  "Materi Bootcamp Eksklusif",
+  "Sertifikat",
+  "Akomodasi 1 Malam",
+  "Seluruh Konsumsi",
+  "Networking",
+  "Forum Alumni",
+];
+
+const programCards = [
+  ["01", "Baca Dapil", "Pahami karakter pemilih, kompetisi, isu lokal, dan ruang yang masih bisa dimenangkan."],
+  ["02", "Bangun Strategi", "Susun prioritas, target, tahapan kampanye, positioning, komunikasi, dan cara kerja tim."],
+  ["03", "Ukur Pergerakan", "Gunakan data untuk membaca progres, mengevaluasi kerja, dan memperbaiki strategi."],
+];
+
+export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  const go = (id: string) => {
+    setMenuOpen(false);
+    setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 60);
+  };
+
+  return (
+    <main>
+      <section className="hero" id="top">
+        <div className="hero-contours" />
+        <div className="hero-grid" />
+
+        <header className="masthead">
+          <button className="brand" onClick={() => go("top")}>MENANG POLITIK</button>
+          <nav className="nav">
+            <button onClick={() => go("program")}>Program</button>
+            <button onClick={() => go("benefits")}>Benefit</button>
+            <button onClick={() => go("investment")}>Investasi</button>
+          </nav>
+          <button className="menu-btn" onClick={() => setMenuOpen(true)}>Menu</button>
+        </header>
+
+        <div className="hero-layout">
+          <div className="hero-identity">
+            <span className="hero-index">POLITICAL BOOTCAMP_2029</span>
+            <h1>MENANG<br/>POLITIK</h1>
+            <div className="hero-tagline">
+              <p>Jadi Caleg, atau Caleg Jadi?</p>
+              <span>by Politika Research &amp; Consulting</span>
+            </div>
+            <div className="hero-meta">
+              {['Strategi Elektoral','Pemetaan Dapil','Political Branding'].map((item) => (
+                <div key={item}><span>✦</span><p>{item}</p></div>
+              ))}
+            </div>
+          </div>
+
+          <div className="hero-portrait">
+            <div className="portrait-frame">
+              <Image src="/rio-prayogo.png" alt="Rio Prayogo" fill priority sizes="(max-width: 768px) 92vw, 48vw" className="portrait-image" />
+            </div>
+            <div className="portrait-label">
+              <span>KEY PERSON</span>
+              <strong>Rio Prayogo</strong>
+              <small>Konsultan Politik Nasional</small>
+            </div>
+          </div>
+
+          <aside className="hero-panel">
+            <span className="panel-eyebrow">BOOTCAMP 2029</span>
+            <strong>Coming Soon</strong>
+            <p>Persiapan kandidat berbasis riset, strategi, dan pengalaman lapangan.</p>
+            <button onClick={() => go("investment")}>Lihat program <span>→</span></button>
+          </aside>
+        </div>
+
+        <div className="hero-foot">
+          <span>THE POLITICIAN SCHOOL</span>
+          <span>POLITIKA RESEARCH &amp; CONSULTING</span>
+          <span>2026</span>
+        </div>
+      </section>
+
+      <section className="statement" id="program">
+        <div className="kicker">SEKOLAH PERSIAPAN KANDIDAT MENUJU PEMILU 2029</div>
+        <h2>Persiapan politik tidak dimulai ketika baliho sudah naik.</h2>
+        <p>Nama, jaringan, basis dukungan, dan cara kerja tim membutuhkan waktu. Program ini dirancang untuk membantu kandidat memulai lebih awal, bekerja lebih terukur, dan mengambil keputusan dengan dasar yang lebih kuat.</p>
+      </section>
+
+      <section className="program-section">
+        <div className="section-head">
+          <span>WHAT YOU&apos;LL WORK ON</span>
+          <h2>Dari data menjadi langkah.</h2>
+        </div>
+        <div className="program-grid">
+          {programCards.map(([no,title,desc]) => (
+            <article key={no}>
+              <span>{no}</span>
+              <div><h3>{title}</h3><p>{desc}</p></div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="dark-section" id="benefits">
+        <div className="dark-head">
+          <span>YANG ANDA BAWA PULANG</span>
+          <h2>Bukan hanya catatan kelas.</h2>
+          <p>Peserta pulang membawa bahan kerja yang bisa langsung dipakai untuk melanjutkan persiapan setelah bootcamp selesai.</p>
+        </div>
+        <div className="benefit-list">
+          {benefits.map((item, index) => (
+            <div className="benefit-row" key={item}><span>{String(index + 1).padStart(2,'0')}</span><strong>{item}</strong></div>
+          ))}
+        </div>
+      </section>
+
+      <section className="investment" id="investment">
+        <div className="investment-copy">
+          <span>INVESTASI PROGRAM</span>
+          <h2>Siapkan 2029 dengan serius.</h2>
+          <p>Early bird tersedia untuk sepuluh peserta pertama.</p>
+        </div>
+        <div className="price-wrap">
+          <article className="price-card featured"><span>EARLY BIRD</span><strong>Rp6,5 Juta</strong><p>Untuk 10 pendaftar pertama.</p><button>Masuk Waitlist →</button></article>
+          <article className="price-card"><span>HARGA NORMAL</span><strong>Rp8,5 Juta</strong><p>Setelah kuota early bird terpenuhi.</p><button>Info Program →</button></article>
+        </div>
+        <div className="investment-note">Sudah termasuk akomodasi satu malam, seluruh konsumsi, materi, sertifikat, Laporan Pemetaan Dapil, dan keanggotaan forum alumni. Transportasi menuju lokasi belum termasuk.</div>
+      </section>
+
+      <footer className="footer">
+        <span>MENANG POLITIK</span>
+        <h2>Jadi Caleg,<br/>atau Caleg Jadi?</h2>
+        <div className="footer-bottom"><span>© 2026 The Politician School</span><span>by Politika Research &amp; Consulting</span></div>
+      </footer>
+
+      {menuOpen && (
+        <div className="menu-overlay">
+          <div className="menu-top"><span>MENANG POLITIK</span><button onClick={() => setMenuOpen(false)}>×</button></div>
+          <nav><button onClick={() => go("program")}>Program</button><button onClick={() => go("benefits")}>Benefit</button><button onClick={() => go("investment")}>Investasi</button></nav>
+        </div>
+      )}
+    </main>
+  );
+}
